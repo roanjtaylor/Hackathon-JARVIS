@@ -12,6 +12,7 @@ type SessionStore = {
   setMode: (m: JarvisMode) => void;
   addNode: (type: NodeType, label: string) => void;
   addLinkByLabels: (from: string, to: string) => void;
+  addLogEntry: (entry: string) => void;
   reset: () => void;
   saveSession: (title?: string) => Promise<void>;
   loadSession: (sessionId: string) => Promise<void>;
@@ -23,7 +24,7 @@ type SessionStore = {
 
 export const useSession = create<SessionStore>((set, get) => ({
   mode: "STEP",
-  session: { nodes: [], edges: [], notes: [] },
+  session: { nodes: [], edges: [], notes: [], conversationLog: [] },
   currentSessionId: null,
   sessions: [],
   loading: false,
@@ -67,14 +68,24 @@ export const useSession = create<SessionStore>((set, get) => ({
       return { ...state, session: updatedSession };
     }),
 
+  addLogEntry: (entry) =>
+    set((state) => {
+      const updatedSession = {
+        ...state.session,
+        conversationLog: [...(state.session.conversationLog || []), entry],
+      };
+
+      return { ...state, session: updatedSession };
+    }),
+
   reset: () => set({
-    session: { nodes: [], edges: [], notes: [] },
+    session: { nodes: [], edges: [], notes: [], conversationLog: [] },
     currentSessionId: null
   }),
 
   createNewSession: () => {
     set({
-      session: { nodes: [], edges: [], notes: [] },
+      session: { nodes: [], edges: [], notes: [], conversationLog: [] },
       currentSessionId: null
     });
   },
@@ -84,8 +95,19 @@ export const useSession = create<SessionStore>((set, get) => ({
     set({ loading: true });
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      console.log('🔄 Starting save session...');
+
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) {
+        console.error('❌ Auth error:', authError);
+        throw authError;
+      }
+      if (!user) {
+        console.error('❌ No user found');
+        throw new Error('Not authenticated');
+      }
+
+      console.log('✅ User authenticated:', user.id);
 
       const sessionData = {
         user_id: user.id,
@@ -93,10 +115,19 @@ export const useSession = create<SessionStore>((set, get) => ({
         nodes: state.session.nodes,
         edges: state.session.edges,
         notes: state.session.notes,
+        conversation_log: state.session.conversationLog || [],
       };
+
+      console.log('📦 Session data to save:', {
+        ...sessionData,
+        nodes: `${sessionData.nodes.length} nodes`,
+        edges: `${sessionData.edges.length} edges`,
+        conversation_log: `${sessionData.conversation_log.length} messages`,
+      });
 
       if (state.currentSessionId) {
         // Update existing session
+        console.log('🔄 Updating existing session:', state.currentSessionId);
         const { data, error } = await supabase
           .from('sessions')
           .update(sessionData)
@@ -104,7 +135,12 @@ export const useSession = create<SessionStore>((set, get) => ({
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Update error:', error);
+          throw error;
+        }
+
+        console.log('✅ Session updated successfully:', data);
 
         // Update sessions list
         set((state) => ({
@@ -115,13 +151,19 @@ export const useSession = create<SessionStore>((set, get) => ({
         }));
       } else {
         // Create new session
+        console.log('➕ Creating new session');
         const { data, error } = await supabase
           .from('sessions')
           .insert(sessionData)
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Insert error:', error);
+          throw error;
+        }
+
+        console.log('✅ Session created successfully:', data);
 
         set((state) => ({
           currentSessionId: data.id,
@@ -129,8 +171,17 @@ export const useSession = create<SessionStore>((set, get) => ({
           loading: false,
         }));
       }
-    } catch (error) {
-      console.error('Error saving session:', error);
+
+      console.log('✅ Save completed successfully');
+    } catch (error: any) {
+      console.error('❌ Error saving session:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        code: error?.code,
+      });
+      alert(`Failed to save session: ${error?.message || 'Unknown error'}`);
       set({ loading: false });
     }
   },
@@ -152,6 +203,7 @@ export const useSession = create<SessionStore>((set, get) => ({
           nodes: data.nodes || [],
           edges: data.edges || [],
           notes: data.notes || [],
+          conversationLog: data.conversation_log || [],
         },
         currentSessionId: sessionId,
         loading: false,
@@ -166,8 +218,19 @@ export const useSession = create<SessionStore>((set, get) => ({
     set({ loading: true });
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      console.log('🔄 Loading sessions...');
+
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) {
+        console.error('❌ Auth error:', authError);
+        throw authError;
+      }
+      if (!user) {
+        console.error('❌ No user found');
+        throw new Error('Not authenticated');
+      }
+
+      console.log('✅ User authenticated:', user.id);
 
       const { data, error } = await supabase
         .from('sessions')
@@ -175,14 +238,26 @@ export const useSession = create<SessionStore>((set, get) => ({
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Load error:', error);
+        throw error;
+      }
+
+      console.log('✅ Sessions loaded:', data?.length || 0, 'sessions');
+      console.log('Sessions data:', data);
 
       set({
         sessions: data || [],
         loading: false,
       });
-    } catch (error) {
-      console.error('Error loading sessions:', error);
+    } catch (error: any) {
+      console.error('❌ Error loading sessions:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        code: error?.code,
+      });
       set({ loading: false });
     }
   },
@@ -202,7 +277,7 @@ export const useSession = create<SessionStore>((set, get) => ({
         sessions: state.sessions.filter(s => s.id !== sessionId),
         currentSessionId: state.currentSessionId === sessionId ? null : state.currentSessionId,
         session: state.currentSessionId === sessionId
-          ? { nodes: [], edges: [], notes: [] }
+          ? { nodes: [], edges: [], notes: [], conversationLog: [] }
           : state.session,
         loading: false,
       }));

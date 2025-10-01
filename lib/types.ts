@@ -14,6 +14,7 @@ export type SessionState = {
   nodes: { id: string; type: NodeType; label: string }[];
   edges: { id: string; from: string; to: string }[];
   notes: string[];
+  conversationLog?: string[];
 };
 
 export type JarvisMode = "LISTEN" | "INTERRUPT" | "STEP";
@@ -31,6 +32,7 @@ export type Session = {
   nodes: { id: string; type: NodeType; label: string }[];
   edges: { id: string; from: string; to: string }[];
   notes: string[];
+  conversationLog?: string[];
   created_at: string;
   updated_at: string;
 };

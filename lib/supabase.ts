@@ -16,6 +16,7 @@ export type Database = {
           nodes: any[]
           edges: any[]
           notes: string[]
+          conversation_log: string[]
           created_at: string
           updated_at: string
         }
@@ -26,6 +27,7 @@ export type Database = {
           nodes?: any[]
           edges?: any[]
           notes?: string[]
+          conversation_log?: string[]
           created_at?: string
           updated_at?: string
         }
@@ -36,6 +38,7 @@ export type Database = {
           nodes?: any[]
           edges?: any[]
           notes?: string[]
+          conversation_log?: string[]
           created_at?: string
           updated_at?: string
         }

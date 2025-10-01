@@ -6,9 +6,13 @@ CREATE TABLE IF NOT EXISTS public.sessions (
     nodes JSONB DEFAULT '[]'::jsonb,
     edges JSONB DEFAULT '[]'::jsonb,
     notes JSONB DEFAULT '[]'::jsonb,
+    conversation_log JSONB DEFAULT '[]'::jsonb,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Add conversation_log column if it doesn't exist (for existing databases)
+ALTER TABLE public.sessions ADD COLUMN IF NOT EXISTS conversation_log JSONB DEFAULT '[]'::jsonb;
 
 -- Enable RLS on sessions table
 ALTER TABLE public.sessions ENABLE ROW LEVEL SECURITY;
