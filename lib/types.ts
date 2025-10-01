@@ -38,9 +38,13 @@ export type Session = {
 };
 
 export type Artifacts = {
-  prd_md: string;
-  deck_md: string;
-  prompts: {
+  problem_statement?: string;
+  solution_statement?: string;
+  roadmap_md?: string;
+  prd_md?: string;
+  deck_md?: string;
+  todo_md?: string;
+  prompts?: {
     code: string;
     design: string;
     research: string;

@@ -230,39 +230,39 @@ function JarvisApp() {
                 {log.length === 0 ? (
                   <div className="text-gray-700 py-6 px-4 space-y-6">
                     <div className="text-center">
-                      <div className="text-5xl mb-4">💡</div>
-                      <div className="font-semibold text-xl mb-2">What do you want to plan and build today?</div>
-                      <div className="text-sm text-gray-600">
-                        Share your idea with me. I'll help you think it through and build a solid plan.
+                      <div className="text-5xl mb-4">🧠</div>
+                      <div className="font-semibold text-xl mb-2">Let's clarify your idea</div>
+                      <div className="text-sm text-gray-600 max-w-2xl mx-auto">
+                        I'm here to help you go from a fuzzy idea to a crystal-clear plan. Tell me what you're thinking about building, and I'll ask you the right questions to help you define the problem, articulate your solution, and create an execution roadmap.
                       </div>
                     </div>
 
                     <div className="border-t pt-4 space-y-3">
                       <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                        💬 Example prompts to get started:
+                        Here's how this works:
                       </div>
-                      <div className="space-y-2">
-                        {[
-                          "I'm thinking about building an app that helps people...",
-                          "I've noticed a problem where users struggle with...",
-                          "What if we could make it easier for teams to...",
-                          "I want to create a tool that solves...",
-                        ].map((prompt, i) => (
-                          <div
-                            key={i}
-                            className="p-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:border-blue-300 hover:bg-blue-50 transition-colors cursor-pointer"
-                            onClick={() => {
-                              // User can click to use as a starting point
-                              const textarea = document.querySelector('textarea');
-                              if (textarea) {
-                                textarea.value = prompt;
-                                textarea.focus();
-                              }
-                            }}
-                          >
-                            "{prompt}"
-                          </div>
-                        ))}
+                      <div className="grid gap-3">
+                        <div className="p-3 bg-white border border-gray-200 rounded-lg">
+                          <div className="font-medium text-sm mb-1">1️⃣ Define the Problem</div>
+                          <div className="text-xs text-gray-600">Who has this problem? What breaks for them today?</div>
+                        </div>
+                        <div className="p-3 bg-white border border-gray-200 rounded-lg">
+                          <div className="font-medium text-sm mb-1">2️⃣ Clarify the Solution</div>
+                          <div className="text-xs text-gray-600">What's the smallest version that proves value? How do we measure success?</div>
+                        </div>
+                        <div className="p-3 bg-white border border-gray-200 rounded-lg">
+                          <div className="font-medium text-sm mb-1">3️⃣ Create the Roadmap</div>
+                          <div className="text-xs text-gray-600">What's the concrete path from problem to solution?</div>
+                        </div>
+                      </div>
+
+                      <div className="pt-3 border-t">
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                          Ready? Just start talking about your idea:
+                        </div>
+                        <div className="text-xs text-gray-500 italic">
+                          "I want to build something that helps..." or "I've noticed a problem where..."
+                        </div>
                       </div>
                     </div>
                   </div>

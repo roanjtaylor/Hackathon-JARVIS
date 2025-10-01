@@ -77,37 +77,79 @@ export function ArtifactsPanel() {
       <div className="flex-1 overflow-auto space-y-4">
         {artifacts ? (
           <>
-            <Section
-              title="PRD.md"
-              text={artifacts.prd_md}
-              onCopy={() => copyToClipboard(artifacts.prd_md, "PRD")}
-            />
-            <Section
-              title="Deck.md"
-              text={artifacts.deck_md}
-              onCopy={() => copyToClipboard(artifacts.deck_md, "Deck")}
-            />
-            <Section
-              title="prompts/code.txt"
-              text={artifacts.prompts?.code}
-              onCopy={() => copyToClipboard(artifacts.prompts?.code || "", "Code Prompt")}
-            />
-            <Section
-              title="prompts/design.txt"
-              text={artifacts.prompts?.design}
-              onCopy={() => copyToClipboard(artifacts.prompts?.design || "", "Design Prompt")}
-            />
-            <Section
-              title="prompts/research.txt"
-              text={artifacts.prompts?.research}
-              onCopy={() => copyToClipboard(artifacts.prompts?.research || "", "Research Prompt")}
-            />
+            {artifacts.problem_statement && (
+              <Section
+                title="Problem Statement"
+                text={artifacts.problem_statement}
+                onCopy={() => copyToClipboard(artifacts.problem_statement || "", "Problem Statement")}
+              />
+            )}
+            {artifacts.solution_statement && (
+              <Section
+                title="Solution Statement"
+                text={artifacts.solution_statement}
+                onCopy={() => copyToClipboard(artifacts.solution_statement || "", "Solution Statement")}
+              />
+            )}
+            {artifacts.roadmap_md && (
+              <Section
+                title="Roadmap (A→B)"
+                text={artifacts.roadmap_md}
+                onCopy={() => copyToClipboard(artifacts.roadmap_md || "", "Roadmap")}
+                isMarkdown
+              />
+            )}
+            {artifacts.prd_md && (
+              <Section
+                title="PRD.md"
+                text={artifacts.prd_md}
+                onCopy={() => copyToClipboard(artifacts.prd_md, "PRD")}
+                isMarkdown
+              />
+            )}
+            {artifacts.deck_md && (
+              <Section
+                title="Deck.md"
+                text={artifacts.deck_md}
+                onCopy={() => copyToClipboard(artifacts.deck_md, "Deck")}
+                isMarkdown
+              />
+            )}
+            {artifacts.todo_md && (
+              <Section
+                title="To-Do Checklist"
+                text={artifacts.todo_md}
+                onCopy={() => copyToClipboard(artifacts.todo_md || "", "To-Do")}
+                isMarkdown
+              />
+            )}
+            {artifacts.prompts?.code && (
+              <Section
+                title="prompts/code.txt"
+                text={artifacts.prompts?.code}
+                onCopy={() => copyToClipboard(artifacts.prompts?.code || "", "Code Prompt")}
+              />
+            )}
+            {artifacts.prompts?.design && (
+              <Section
+                title="prompts/design.txt"
+                text={artifacts.prompts?.design}
+                onCopy={() => copyToClipboard(artifacts.prompts?.design || "", "Design Prompt")}
+              />
+            )}
+            {artifacts.prompts?.research && (
+              <Section
+                title="prompts/research.txt"
+                text={artifacts.prompts?.research}
+                onCopy={() => copyToClipboard(artifacts.prompts?.research || "", "Research Prompt")}
+              />
+            )}
           </>
         ) : (
           <div className="text-center text-gray-500 py-8">
             <div className="text-4xl mb-4">📄</div>
             <div className="text-lg font-medium">No artifacts yet</div>
-            <div className="text-sm">Generate artifacts from your canvas</div>
+            <div className="text-sm">Once you've worked through your idea, generate artifacts to get your PRD, roadmap, and execution prompts</div>
           </div>
         )}
       </div>
@@ -119,10 +161,12 @@ function Section({
   title,
   text,
   onCopy,
+  isMarkdown = false,
 }: {
   title: string;
   text: string;
   onCopy: () => void;
+  isMarkdown?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -144,7 +188,9 @@ function Section({
         </button>
       </div>
       <textarea
-        className="w-full h-32 text-sm border rounded p-2 resize-none bg-gray-50"
+        className={`w-full text-sm border rounded p-2 resize-none bg-gray-50 ${
+          isMarkdown ? "h-64" : "h-32"
+        }`}
         value={text || ""}
         readOnly
         placeholder="Content will appear here..."
